@@ -2,7 +2,7 @@ ashuffle
 ========
 
 Fork changes:
-Keep 2 songs in list instead of 1, to avoid foobar2000 clients occasionally stopping playback between tracks when streaming through MPD:s http output (not yet done)
+Keep 2 songs in list instead of 1, to avoid foobar2000 clients occasionally stopping playback between tracks when streaming through MPD:s http output (might break but seems to work)
 
 Table of Contents:
 * [features](#features)
