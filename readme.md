@@ -1,7 +1,8 @@
 ashuffle
 ========
 
-> __Maintainer's Note:__ Even though there have been no new commits on this repo in over a year, it is not dead, it just isn't broken yet. I actively maintain this repo, and use this software daily. If you find any bugs, please open an issue.
+Fork changes:
+Keep 2 songs in list instead of 1, to avoid foobar2000 clients occasionally stopping playback between tracks when streaming through MPD:s http output (not yet done)
 
 Table of Contents:
 * [features](#features)
