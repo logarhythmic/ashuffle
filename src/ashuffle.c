@@ -145,6 +145,8 @@ void queue_random_song(struct mpd_connection * mpd,
     if (mpd_run_add(mpd, shuffle_pick(songs)) != true) { mpd_perror(mpd); }
 }
 
+/* If the player is stopped, add a song 
+   and start playing */
 int try_first(struct mpd_connection * mpd, struct shuffle_chain * songs) {
     struct mpd_status * status;
     status = mpd_run_status(mpd);
@@ -164,6 +166,7 @@ int try_first(struct mpd_connection * mpd, struct shuffle_chain * songs) {
     return 0;
 }
 
+/* Add a song if conditions are fulfilled */
 int try_enqueue(struct mpd_connection * mpd, 
                 struct shuffle_chain * songs) {
     struct mpd_status * status;
@@ -176,18 +179,25 @@ int try_enqueue(struct mpd_connection * mpd,
         return -1;
     }
 
-    bool past_last = mpd_status_get_song_pos(status) == -1;
+    // Is there no current song (= we ran out)?
+    bool past_last = mpd_status_get_song_pos(status) == -1; 
+    // Is the current song the last one?
+    bool last_next = mpd_status_get_next_song_pos(status) == -1; 
+    // Is the queue length 0 (= queue is empty)? Also true if MPD does not specify
     bool queue_empty = mpd_status_get_queue_length(status) == 0;
+    // Using this instead should keep 2 songs in the queue
+    bool queue_running_out = mpd_status_get_queue_length(status) <= 1;
 
     /* If the currently playing song is the last song in the list,
      * then when MPD stops playing, add another song to the list and
      * restart the player */
-    if (past_last || queue_empty) {
+    if (last_next || queue_running_out) {
         queue_random_song(mpd, songs);
         /* Since the 'status' was before we added our song, and the queue
          * is zero-indexed, the length will be the position of the song we
          * just added. Play that song */
-        if (mpd_run_play_pos(mpd, mpd_status_get_queue_length(status)) != true) {
+         // Checking past_last here means it only restarts playing if the queue ran out and playback stopped
+        if (past_last && mpd_run_play_pos(mpd, mpd_status_get_queue_length(status)) != true) {
             mpd_perror(mpd);
         }
         /* Immediately pause playback if mpd single mode is on */
